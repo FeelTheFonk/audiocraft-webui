@@ -31,9 +31,14 @@
                     <div class="field">
                         <label>{{ form.model.label }}</label>
                         {{ form.model(id="model") }}
-                    </div>                    
+                    </div>               
                 </div>
-
+                    <!-- Custom model file input field -->
+                    <div class="field">
+                        <label>Custom Model</label>
+                        <input type="file" id="custom_model" name="custom_model" accept=".pt">
+                    </div>                   
+                </div>
                 {% macro slider_field(name, min_value, max_value, step_value, data) %}
                 <div class="field">
                     <label>{{ form[name].label }}</label>
