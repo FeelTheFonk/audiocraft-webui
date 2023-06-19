@@ -31,8 +31,6 @@ def load_and_process_audio(model, melody, sample_rate):
     else:
         return None
 
-#From https://colab.research.google.com/drive/154CqogsdP-D_TfSF9S2z8-BY98GN_na4?usp=sharing#scrollTo=exKxNU_Z4i5I
-#Thank you DragonForged for the link
 def extend_audio(model, prompt_waveform, prompt, prompt_sr, segments=5, overlap=2):
     # Calculate the number of samples corresponding to the overlap
     overlap_samples = int(overlap * prompt_sr)
@@ -56,15 +54,18 @@ def extend_audio(model, prompt_waveform, prompt, prompt_sr, segments=5, overlap=
 
 def predict(socketio, model, prompt, model_parameters, melody_parameters, extension_parameters, extra_settings_parameters):
     global MODEL
-    if MODEL is None or MODEL.name != model:
-        if MODEL is not None:
-            del MODEL
-            torch.cuda.empty_cache()
-            torch.cuda.synchronize()
-        MODEL = load_model(model, socketio)
-        if MODEL is None:
-            return None
-        return predict(socketio, model, prompt, model_parameters, melody_parameters, extension_parameters, extra_settings_parameters)
+    if isinstance(model, str):  # If the model parameter is a string
+        if MODEL is None or MODEL.name != model:
+            if MODEL is not None:
+                del MODEL
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+            MODEL = load_model(model, socketio)
+            if MODEL is None:
+                return None
+            return predict(socketio, model, prompt, model_parameters, melody_parameters, extension_parameters, extra_settings_parameters)
+    else:  # If the model parameter is a PyTorch model object
+        MODEL = model
 
     MODEL.set_generation_params(
         use_sampling=True,
