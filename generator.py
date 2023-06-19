@@ -19,8 +19,12 @@ class HijackedMusicGen(MusicGen):
         
     @staticmethod
     def get_pretrained(socketio, name: str = 'melody', device='cuda'):
-        music_gen = MusicGen.get_pretrained(name, device)
+        if isinstance(name, str):  # If the name parameter is a string
+            music_gen = MusicGen.get_pretrained(name, device)
+        else:  # If the name parameter is a PyTorch model object
+            music_gen = name
         return HijackedMusicGen(socketio, music_gen.name, music_gen.compression_model, music_gen.lm)
+
     
     @property
     def progress_callback(self):
