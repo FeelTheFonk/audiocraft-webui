@@ -58,7 +58,9 @@ def save_output(output, sample_rate, text):
     return output_filename
         
 def handle_submit(form, files):
+    global socketio  # Declare socketio as a global variable
     model = form.model.data
+    custom_model_file = request.files['custom_model']  # Get the uploaded custom model file
     prompt = form.text.data
     model_parameters = {
         "duration": form.duration.data,
@@ -88,6 +90,13 @@ def handle_submit(form, files):
             melody_parameters['melody'], melody_parameters['sample_rate'] = librosa.load(temp_filename, sr=None)
             print(f"Using melody file: {temp_filename}")
             os.remove(temp_filename)  # Delete the temporary file
+
+    # Handle custom model file
+    if custom_model_file and custom_model_file.filename != '':
+        custom_model_path = f"/tmp/{uuid.uuid4()}.pt"
+        custom_model_file.save(custom_model_path)
+        model = torch.load(custom_model_path)  # Load the custom model
+        os.remove(custom_model_path)  # Delete the temporary file
 
     for name, value in {**model_parameters, **extension_parameters}.items():
         print(f"{name}: {value}")
