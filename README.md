@@ -1,14 +1,16 @@
-# WIP <https://github.com/chavinlo/musicgen_trainer> implementations:
+# WIP 
+<https://github.com/chavinlo/musicgen_trainer> implementations:
 
 - Load previously trained .pt model and use it with the correct model (small, medium, large)> **Done**
 - Training UI/Tab> **WIP**
 
-[![Discord](https://img.shields.io/discord/232596713892872193?logo=discord)](https://discord.gg/2JhHVh7CGu)
 
-# audiocraft-webui
+# audiocraft-webui![UI_sample](https://github.com/FeelTheFonk/audiocraft-webui/assets/134219563/4eb1ac3d-d4e7-4a79-9273-d9878b0f685e)
+
 Local webui for Facebook's Audiocraft model: <https://github.com/facebookresearch/audiocraft>
 
-![](https://github.com/CoffeeVampir3/audiocraft-webui/blob/1a1390e2842a7eaa8de376503abb51fbfad233ca/preview.png)
+![]()
+![Uploading UI_sample.png…]()
 
 ## Features:
 
