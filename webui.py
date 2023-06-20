@@ -12,7 +12,9 @@ import librosa
 import soundfile as sf
 from audio import predict
 from audiocraft.data.audio import audio_write
-
+if not os.path.exists('./temp'):
+    os.makedirs('./temp')
+    
 app = Flask(__name__)
 unload = False
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -39,39 +41,62 @@ def sanitize_filename(filename):
     """
     return re.sub(r'[^\w\d-]', ' ', filename)
 
-
 def save_output(output, sample_rate, text):
     """
     Save output to a WAV file with the filename based on the input text.
     If a file with the same name already exists, append a number in parentheses.
     """
     i = 1
-    base_filename = f"static/audio/{sanitize_filename(text)}"
-    output_filename = f"{base_filename}.wav"
-    
-    # Convert to absolute path
-    absolute_path = os.path.abspath(output_filename)
-    
-    # Check if the absolute path is too long
-    max_length = 255  # Maximum path length for most file systems
-    if len(absolute_path) > max_length:
-        # If the path is too long, truncate the filename
-        base_filename = base_filename[:max_length - len(os.path.abspath(f"static/audio/")) - 10]  # Reserve space for extension and potential index
-        output_filename = f"{base_filename}.wav"
-    
+    base_filename = f"static/audio/{sanitize_filename(text)}.wav"
+    output_filename = base_filename
     while os.path.exists(output_filename):
-        output_filename = f"{base_filename}({i}).wav"
+        output_filename = f"{base_filename.rsplit('.', 1)[0]}({i}).wav"
         i += 1
-        
+
+    print(output.squeeze())
     audio_write(
         output_filename, output.squeeze(), sample_rate, strategy="loudness",
         loudness_headroom_db=16, loudness_compressor=True, add_suffix=False)
     return output_filename
+   
+@app.route('/', methods=['GET', 'POST'])
+def home_and_submit():
+    form = MusicForm(request.form)
+    output_filename = None  # Initialize output_filename here
+
+    if request.method == 'POST' and form.validate():
+        files = {}
+        if 'melody' in request.files and request.files['melody'].filename != '':
+            melody_file = request.files['melody']
+            extension = os.path.splitext(melody_file.filename)[1]
+            temp_filename = f"./temp/{uuid.uuid4()}{extension}"
+            melody_file.save(temp_filename)
+            files['melody'] = temp_filename
+        if 'custom_model' in request.files and request.files['custom_model'].filename != '':
+            custom_model_file = request.files['custom_model']
+            custom_model_path = f"./temp/{uuid.uuid4()}.pt"
+            custom_model_file.save(custom_model_path)
+            files['custom_model'] = custom_model_path
+        pending_queue.put((form, files))
+        return redirect(url_for('home_and_submit'))
         
+    audio_dir = pathlib.Path('static/audio')
+    audio_dir.mkdir(parents=True, exist_ok=True)
+
+    audio_files_dicts = [
+        {'text': audio_file.name, 'audio_file': audio_file.name, 'timestamp': audio_file.stat().st_mtime}
+        for audio_file in audio_dir.glob('*')
+    ]
+    
+    if request.method == 'GET':
+        return render_template('form.html', form=form, audio_files=audio_files_dicts)
+   
 def handle_submit(form, files):
     global socketio  # Declare socketio as a global variable
-    model = form.model.data
-    custom_model_file = request.files['custom_model']  # Get the uploaded custom model file
+    model_id = form.model.data
+    model = MusicGen.get_pretrained(model_id)
+    model.lm = model.lm.to(torch.float32)
+    custom_model_file = files.get('custom_model')  # Get the uploaded custom model file
     prompt = form.text.data
     model_parameters = {
         "duration": form.duration.data,
@@ -103,10 +128,11 @@ def handle_submit(form, files):
             os.remove(temp_filename)  # Delete the temporary file
 
     # Handle custom model file
-    if custom_model_file and custom_model_file.filename != '':
-        custom_model_path = f"/tmp/{uuid.uuid4()}.pt"
-        custom_model_file.save(custom_model_path)
-        model = torch.load(custom_model_path)  # Load the custom model
+    if files and 'custom_model' in files and files['custom_model'] != '':
+        custom_model_path = files['custom_model']
+        custom_model_state_dict = torch.load(custom_model_path)  # Load the custom model state dict
+        model.lm.load_state_dict(custom_model_state_dict)
+        model.lm = model.lm.to(torch.float32)
         os.remove(custom_model_path)  # Delete the temporary file
 
     for name, value in {**model_parameters, **extension_parameters}.items():
@@ -129,41 +155,21 @@ class MusicForm(Form):
     temperature = FloatField('Temperature', default=1.0)
     cfg_coef = FloatField('Classifier Free Guidance', default=7)
     segments = IntegerField('Segments', default=10, validators=[NumberRange(min=1, max=10)])
-    overlap = FloatField('Overlap', default=5.0) 
+    overlap = FloatField('Overlap', default=2.0) 
     submit = SubmitField('Submit')
+
+@app.route('/upload_model', methods=['POST'])
+def upload_model():
+    file = request.files['model_file']
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return jsonify({'model_id': filename})
 
 @app.route('/api/audio-files', methods=['GET'])
 def get_audio_files():
     audio_files = [(f, f, os.path.getmtime(f'static/audio/{f}')) for f in os.listdir('static/audio')]
     audio_files_dicts = [{'text': text, 'audio_file': audio_file, 'timestamp': timestamp} for text, audio_file, timestamp in audio_files]
     return jsonify(audio_files_dicts)
-
-@app.route('/', methods=['GET', 'POST'])
-def home_and_submit():
-    form = MusicForm(request.form)
-    output_filename = None  # Initialize output_filename here
-
-    if request.method == 'POST' and form.validate():
-        files = None
-        if 'melody' in request.files and request.files['melody'].filename != '':
-            melody_file = request.files['melody']
-            extension = os.path.splitext(melody_file.filename)[1]
-            temp_filename = f"/tmp/{uuid.uuid4()}{extension}"
-            melody_file.save(temp_filename)
-            files = {'melody': temp_filename}
-        pending_queue.put((form, files))
-        return redirect(url_for('home_and_submit'))
-        
-    audio_dir = pathlib.Path('static/audio')
-    audio_dir.mkdir(parents=True, exist_ok=True)
-
-    audio_files_dicts = [
-        {'text': audio_file.name, 'audio_file': audio_file.name, 'timestamp': audio_file.stat().st_mtime}
-        for audio_file in audio_dir.glob('*')
-    ]
-    
-    if request.method == 'GET':
-        return render_template('form.html', form=form, audio_files=audio_files_dicts)
 
 if __name__ == '__main__':
     if not os.path.exists('static/audio'):
