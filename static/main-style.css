@@ -1,53 +1,21 @@
 :root {
-    --kangaroo: #b8a1a0;
-    --flamingo: #b59a9a;
-    --unicorn: #b87d9b;
-    --platypus: #9f82bd;
-    --raccoon: #b26c80;
-    --tortoise: #b37884;
-    --dinosaur: #ba8569;
-    --yak: #baa778;
-    --lizard: #82b37b;
-    --chameleon: #73b2a8;
-    --stingray: #6ca7b3;
-    --narwhal: #5ca0b2;
-    --dolphin: #6c8fb9;
-    --jellyfish: #8b96bf;
-    --cuttlefish: #9ba3b6;
-    --walrus: #9299a3;
-    --penguin: #7f8392;
-    --meerkat: #73767e;
-    --weasel: #626474;
-    --mongoose: #54565c;
-    --lemur: #464858;
-    --hamster: #353645;
-    --badger: #24242f;
-    --kitten: #15151d;
-    --puppy: #141417;
-    --hamster: #0d0d0f;
+    --primary-color: #b8a1a0;
+    --secondary-color: #b59a9a;
+    --accent-color: #b87d9b;
+    --text-color: #ffffff;
+    --background-color: #141417;
 }
 
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: var(--kitten);
-    color: var(--cuttlefish);
+    background-color: var(--background-color);
+    color: var(--text-color);
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-}
-
-select {
-    background-color: var(--opossum);
-    color: var(--jellyfish);
-    font-size: 18px;
-}
-
-textarea {
-    background-color: var(--opossum);
-    color: var(--cuttlefish);
 }
 
 .container {
@@ -66,29 +34,13 @@ form {
 .third-box {
     box-sizing: border-box; 
     padding: 1em;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--secondary-color);
     border-radius: 1em;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-    background-color: var(--kitten);
+    background-color: var(--background-color);
 }
 
-.audio-padding {
-    height: 20px;
-}
-
-.prompt-queue {
-    flex-basis: 30%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 95vh;
-}
-
-.audio-list {
+.prompt-queue, .audio-list {
     flex-basis: 30%;
     max-height: 95vh;
     height:90%;
@@ -100,11 +52,6 @@ form {
     padding-right: 20px;
 }
 
-@keyframes fadeIn {
-    0% {opacity: 0;}
-    100% {opacity: 1;}
-}
-
 .audio-item {
     width:95%;
     max-width: 95%;
@@ -112,30 +59,11 @@ form {
     align-items: center;
     margin-bottom: 10px;
     padding: 10px;
-    border: 1px solid var(--hamster);
+    border: 1px solid var(--secondary-color);
     border-radius: 5px;
-    box-shadow: 0px 0px 5px var(--flamingo);
+    box-shadow: 0px 0px 5px var(--accent-color);
     justify-content: space-between;
     animation: fadeIn 1.8s;
-}
-
-.audio-list::-webkit-scrollbar {
-    width: 10px;
-}
-
-.audio-list::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.audio-list::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 20px;
-}
-
-.audio-item-text {
-    max-width: 90%;
-    overflow-wrap: break-word;
-    text-align: left;
 }
 
 .field {
@@ -153,7 +81,7 @@ form {
 .field label {
     display: block;
     margin-bottom: 0.5em;
-    color: var(--light-text-color); 
+    color: var(--text-color); 
     font-size: 1.2em;
     font-weight: 500;
 }
@@ -161,8 +89,8 @@ form {
 .submit-container {
     flex-grow: 1;
     width: 100%;
-    border: 1px solid var(--lemur);
-    background-color: var(--badger);
+    border: 1px solid var(--secondary-color);
+    background-color: var(--background-color);
     border-radius: 10px;
     padding: 10px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
@@ -171,7 +99,35 @@ form {
 .input-wrapper {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+#submit {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: 2px solid var(--secondary-color);
+    padding: 0.5em 1em;
+    border-radius: 0.25em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+    display: inline-block;
+    text-decoration: none;
+}
+
+#submit:hover {
+    background-color: var(--accent-color);
+}
+
+#submit:active {
+    background-color: var(--secondary-color);
+    transform: scale(0.95);
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
 }
 
 .input-wrapper textarea {
@@ -180,7 +136,7 @@ form {
     border-radius: 12px;
 }
 
-.input-wrapper input[type="submit"] {
+.input-wrapper #submit {
     align-self: flex-end;
     font-size: 1.2em;
     font-weight: bold;
@@ -197,7 +153,7 @@ form {
     transition: all 0.3s ease;
 }
 
-.submit-container input[type="submit"] {
+.submit-container #submit {
     background-color: var(--flamingo);
     color: var(--kitten);
     border: none;
@@ -207,11 +163,11 @@ form {
     transition: all 0.3s ease;
 }
 
-.submit-container input[type="submit"]:hover {
+.submit-container #submit:hover {
     background-color: var(--platypus);
 }
 
-.submit-container input[type="submit"]:active {
+.submit-container #submit:active {
     background-color: var(--unicorn);
     transform: scale(0.95);
 }
@@ -234,6 +190,7 @@ form {
 
 .slider-value {
     background-color: var(--jellyfish);
+	color: #F5F5DC;
     width: 40px;
     text-align: center;
     border: 3px;
@@ -255,4 +212,4 @@ form {
     background-size: 400% 400%;
     animation: gradient 1.8s ease infinite;
     color: white; /* Change text color so it's readable on the gradient */
-}
+}	
