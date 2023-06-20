@@ -3,7 +3,9 @@
 
 - Load previously trained .pt model and use it with the correct model (small, medium, large)> **Done**
 - Training UI/Tab> **WIP**
-
+- Progress bar
+- Parameters presets selection
+- Music visualiser
 
 # audiocraft-webui![UI_sample](https://github.com/FeelTheFonk/audiocraft-webui/assets/134219563/4eb1ac3d-d4e7-4a79-9273-d9878b0f685e)
 
