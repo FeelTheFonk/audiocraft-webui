@@ -1,4 +1,4 @@
-#WIP_MusicGen_train <https://github.com/chavinlo/musicgen_trainer> implementations:
+# WIP_MusicGen_train <https://github.com/chavinlo/musicgen_trainer> implementations:
 -Load previously trained .pt model and use it with the correct model (small, medium, large) that has been trained on
 -Training UI/Tab
 
