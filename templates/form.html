@@ -11,7 +11,6 @@
     <div class="container">
         <form id="form" method="POST" enctype="multipart/form-data">
             <div id="advanced-settings" class="third-box">
-                
                 <div class="group model-melody">
                     <div id="melody-field" class="field">
                         <label>{{ form.melody.label }}</label>
@@ -33,49 +32,49 @@
                         {{ form.model(id="model") }}
                     </div>               
                 </div>
-                    <!-- Custom model file input field -->
-                    <div class="field">
-                        <label>Custom Model</label>
-                        <input type="file" id="custom_model" name="custom_model" accept=".pt">
-                    </div>                   
-                </div>
-                {% macro slider_field(name, min_value, max_value, step_value, data) %}
+                <!-- Custom model file input field -->
                 <div class="field">
-                    <label>{{ form[name].label }}</label>
-                    <input type="range" id="{{ name }}" name="{{ name }}" min="{{ min_value }}" max="{{ max_value }}" step="{{ step_value }}" value="{{ data }}">
-                    <input type="text" id="{{ name }}-text" value="{{ data }}" class="slider-value">
+                    <label>Custom Model</label>
+                    <input type="file" id="custom_model" name="custom_model" accept=".pt">
+                </div>                   
+            </div>
+            {% macro slider_field(name, min_value, max_value, step_value, data) %}
+            <div class="field">
+                <label>{{ form[name].label }}</label>
+                <input type="range" id="{{ name }}" name="{{ name }}" min="{{ min_value }}" max="{{ max_value }}" step="{{ step_value }}" value="{{ data }}">
+                <input type="text" id="{{ name }}-text" value="{{ data }}" class="slider-value">
+            </div>
+            {% endmacro %}
+            <div class="group slider-group">
+                <div>
+                    {{ slider_field('topk', 0, 1000, 1, form.topk.data) }}
+                    {{ slider_field('duration', 1, 1000, 1, form.duration.data) }}
+                    {{ slider_field('cfg_coef', 1, 10, 0.1, form.cfg_coef.data) }}
                 </div>
-                {% endmacro %}
-                <div class="group slider-group">
-                    <div>
-                        {{ slider_field('topk', 0, 1000, 1, form.topk.data) }}
-                        {{ slider_field('duration', 1, 1000, 1, form.duration.data) }}
-                        {{ slider_field('cfg_coef', 1, 10, 0.1, form.cfg_coef.data) }}
-                    </div>
-                    <div>
-                        {{ slider_field('topp', 0, 1, 0.01, form.topp.data) }}
-                        {{ slider_field('temperature', 0.1, 5, 0.01, form.temperature.data) }}
-                        {{ slider_field('segments', 1, 10, 1, form.segments.data) }}
-                        {{ slider_field('overlap', 0, 10, 0.1, form.overlap.data) }}
-                    </div>
-                </div>                          
+                <div>
+                    {{ slider_field('topp', 0, 1, 0.01, form.topp.data) }}
+                    {{ slider_field('temperature', 0.1, 5, 0.01, form.temperature.data) }}
+                    {{ slider_field('segments', 1, 10, 1, form.segments.data) }}
+                    {{ slider_field('overlap', 0, 10, 0.1, form.overlap.data) }}
+                </div>
+            </div>                          
 
-                <div class="group">
-                    <div class="submit-container">
-                        <div class="input-wrapper">
-                            <textarea id="text" name="text" rows="3" required=""></textarea>
-                            <input id="submit" name="submit" type="submit" value="Submit">
-                        </div>
+            <div class="group">
+                <div class="submit-container">
+                    <div class="input-wrapper">
+                            <textarea id="text" name="text" rows="3" placeholder="Enter your text here..."></textarea>
+                        <input type="submit" id="submit" value="Generate">
                     </div>
                 </div>
-                
             </div>
         </form>
-
-        <div class="prompt-queue third-box"></div>
-        <div class="audio-list third-box"></div>        
-
+        <div class="prompt-queue third-box">
+            <h2>Prompt Queue</h2>
+        </div>
+        <div class="audio-list third-box">
+            <h2>Generated Audio</h2>
+        </div>
     </div>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
-<script src="{{ url_for('static', filename='main.js') }}"></script>
 </html>
