@@ -9,8 +9,6 @@
 
 Local webui for Facebook's Audiocraft model: <https://github.com/facebookresearch/audiocraft>
 
-![]()
-![Uploading UI_sample.png…]()
 
 ## Features:
 
